@@ -1,22 +1,19 @@
 #include <Stepper.h>
+#include <Math.h>
 
 Stepper horizontal = Stepper(64, 3, 5, 4, 6);
 Stepper vertical = Stepper(64, 10, 12, 11, 13);
 
-char in, pos;
-int sH = 0, sV = 0;
-
-void TopLeft();
-void TopRight();
-void BottomLeft();
-void BottomRight();
-void Center();
+int sH = 0, sV = 0, x, y;
+String in;
 
 void setup()
 {
   Serial.begin(9600);
 
   pinMode(11, OUTPUT);
+
+  Serial.setTimeout(10);
   
   for (int i = 3; i <= 13; i++)
   {
@@ -27,145 +24,34 @@ void setup()
   vertical.setSpeed(500);
 
   digitalWrite(8, HIGH);
+
+  horizontal.step(10);
 }
 
 void loop()
 { 
   if (Serial.available() > 0)
   {
-
-    in = Serial.read();
-    
-    if (in == 'q')
-    {
-      if (pos != 'q')
-        TopLeft();
-    }
-    else if (in == 'p')
-    {
-      if (pos != 'p')
-        TopRight();
-    }
-    else if (in == 'z')
-    {
-      //BottomLeft();
-    }
-    else if (in == 'm')
-    {
-      //BottomRight();
-    }
+    in = Serial.readString();
   }
+
+  x = parseDataX(in);
+  y = parseDataY(in);
+  
   delay(1);
 }
 
-void TopLeft()
+int parseDataX(String data)
 {
-  if (sH < 100)
-  {
-    for (;sH <= 100; sH += 1)
-    {
-      horizontal.step(1);
-    }
-  }
+  data.remove(data.indexOf("Y"));
+  data.remove(data.indexOf("X"), 1);
 
-  if (sH > 100)
-  {
-    for (;sH >= 100; sH -= 1)
-    {
-      horizontal.step(-1);
-    } 
-  }
-
-  if (sV < 100)
-  {
-    for (;sV <= 100; sV += 1)
-    {
-      vertical.step(1);
-    } 
-  }
-
-  if (sV > 100)
-  {
-    for (;sV >= 100; sV -= 1)
-    {
-      vertical.step(-1);
-    } 
-  }
-
-  pos = 'q';
-  
+  return data.toInt();
 }
 
-void TopRight()
+int parseDataY(String data)
 {
-  if (sH > -100)
-  {
-    for (;sH >= -100; sH -= 1)
-    {
-      horizontal.step(-1);
-    }
-  }
-
-  if (sH < -100)
-  {
-    for (;sH <= -100; sH += 1)
-    {
-      horizontal.step(1);
-    } 
-  }
-
-  if (sV < 100)
-  {
-    for (;sV <= 100; sV += 1)
-    {
-      vertical.step(1);
-    } 
-  }
-
-  if (sV > 100)
-  {
-    for (;sV >= 100; sV -= 1)
-    {
-      vertical.step(-1);
-    } 
-  }
-
-  pos = 'p';
+  data.remove(0, data.indexOf("Y") + 1);
   
-}
-
-void BottomLeft()
-{
-  if (sH > -100)
-  {
-    for (;sH >= -100; sH -= 1)
-    {
-      horizontal.step(-1);
-    }
-  }
-
-  if (sH < -100)
-  {
-    for (;sH <= -100; sH += 1)
-    {
-      horizontal.step(1);
-    } 
-  }
-
-  if (sV < 100)
-  {
-    for (;sV <= 100; sV += 1)
-    {
-      vertical.step(1);
-    } 
-  }
-
-  if (sV > 100)
-  {
-    for (;sV >= 100; sV -= 1)
-    {
-      vertical.step(-1);
-    } 
-
-  pos = 'p'; 
+  return data.toInt();
 }

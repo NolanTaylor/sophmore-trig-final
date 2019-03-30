@@ -1,22 +1,31 @@
 import numpy
 import cv2
 import serial
+import time
+import struct
 
 cap = cv2.VideoCapture(0)
 
-#ser = serial.Serial('COM9', 9600)
+ser = serial.Serial('COM9', 9600)
 
-lower = numpy.array([29, 86, 6])
-upper = numpy.array([64, 255, 255])
+lower = numpy.array([0, 0, 0])
+upper = numpy.array([80, 60, 40])
+
+count = 0
+
+string = ''
 
 while(True):
+
+    time.sleep(0.01)
+
     ret, frame = cap.read()
 
     blur = cv2.GaussianBlur(frame, (25, 25), 0)
     hsv = cv2.cvtColor(blur, cv2.COLOR_BGR2HSV)
     canny = cv2.Canny(frame, 100, 150)
 
-    mask = cv2.inRange(hsv, lower, upper)
+    mask = cv2.inRange(blur, lower, upper)
 
     ret, thresh = cv2.threshold(mask, 127, 255, 0)
     contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -32,10 +41,23 @@ while(True):
 
         cv2.rectangle(frame, (x,y), (x+w,y+h), (255,0,0), 2)
 
-        cv2.line(frame, (x, y + (h - y)/2), (w, y + (h - y)/2), (10, 10, 255), 2)
-        cv2.line(frame, (x + (w - x)/2, y), (x + (w - x)/2, h), (10, 10, 255), 2)
+        cv2.line(frame, (x, y + h/2), (x + w, y + h/2), (10, 10, 255), 2)
+        cv2.line(frame, (x + w/2, y), (x + w/2, y + h), (10, 10, 255), 2)
 
-        cv2.line(frame, (x, y), (x + w, y + h), (10, 10, 255), 2)
+        cv2.circle(frame, (x + w/2, y + h/2), 10, (255, 10, 255), -1)
+
+        x_out = x + w/2
+        y_out = y + h/2
+
+        x_out = str(x_out)
+        y_out = str(y_out)
+
+        if count % 10 == 0:
+            ser.write("X" + x_out + "Y" + y_out)
+            count = 1
+            print (x_out, y_out)
+        else:
+            count += 1
 
     cv2.imshow('frame', frame)
     cv2.imshow('mask', mask)
@@ -45,5 +67,6 @@ while(True):
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
+ser.close()
 cap.release()
 cv2.destroyAllWindows()
