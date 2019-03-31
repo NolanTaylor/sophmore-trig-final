@@ -8,12 +8,16 @@ cap = cv2.VideoCapture(0)
 
 ser = serial.Serial('COM9', 9600)
 
-lower = numpy.array([0, 0, 0])
-upper = numpy.array([80, 60, 40])
+lower = numpy.array([210, 50, 180])
+upper = numpy.array([255, 180, 255])
 
 count = 0
 
 string = ''
+
+time.sleep(2)
+
+ser.write("X60Y410")
 
 while(True):
 
@@ -44,7 +48,7 @@ while(True):
         cv2.line(frame, (x, y + h/2), (x + w, y + h/2), (10, 10, 255), 2)
         cv2.line(frame, (x + w/2, y), (x + w/2, y + h), (10, 10, 255), 2)
 
-        cv2.circle(frame, (x + w/2, y + h/2), 10, (255, 10, 255), -1)
+        cv2.circle(frame, (x + w/2, y + h/2), 10, (255, 255, 255), -1)
 
         x_out = x + w/2
         y_out = y + h/2
@@ -55,16 +59,15 @@ while(True):
         if count % 10 == 0:
             ser.write("X" + x_out + "Y" + y_out)
             count = 1
-            print (x_out, y_out)
         else:
             count += 1
 
     cv2.imshow('frame', frame)
     cv2.imshow('mask', mask)
     cv2.imshow('canny', canny)
-    cv2.imshow('hsv', hsv)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
+        ser.write("X60Y410")
         break
 
 ser.close()

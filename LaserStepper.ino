@@ -5,7 +5,10 @@ Stepper horizontal = Stepper(64, 3, 5, 4, 6);
 Stepper vertical = Stepper(64, 10, 12, 11, 13);
 
 int sH = 0, sV = 0, x, y;
+double thetaX, thetaY;
 String in;
+
+double pi = 3.141592653589793238462643383279502884197169399375105820974944592307826;
 
 void setup()
 {
@@ -24,8 +27,6 @@ void setup()
   vertical.setSpeed(500);
 
   digitalWrite(8, HIGH);
-
-  horizontal.step(10);
 }
 
 void loop()
@@ -37,6 +38,12 @@ void loop()
 
   x = parseDataX(in);
   y = parseDataY(in);
+
+  thetaX = atan(((x - 60) * 0.15385) / 56);
+  thetaY = atan(((y - 410) * 0.15385) / 56);
+
+  horizontal.step(( -1 * (thetaX * 350)) - sH);
+  sH += ( -1 * (thetaX * 350)) - sH;
   
   delay(1);
 }
