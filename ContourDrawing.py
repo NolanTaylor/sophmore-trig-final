@@ -8,7 +8,7 @@ cap = cv2.VideoCapture(0)
 
 ser = serial.Serial('COM9', 9600)
 
-lower = numpy.array([210, 50, 180])
+lower = numpy.array([160, 60, 170])
 upper = numpy.array([255, 180, 255])
 
 count = 0
@@ -17,7 +17,7 @@ string = ''
 
 time.sleep(2)
 
-ser.write("X60Y410")
+ser.write("X250Y380")
 
 while(True):
 
@@ -58,6 +58,7 @@ while(True):
 
         if count % 10 == 0:
             ser.write("X" + x_out + "Y" + y_out)
+            print (x + w/2, y + h/2)
             count = 1
         else:
             count += 1
@@ -67,7 +68,8 @@ while(True):
     cv2.imshow('canny', canny)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
-        ser.write("X60Y410")
+        ser.write("X250Y380")
+        time.sleep(2)
         break
 
 ser.close()

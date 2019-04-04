@@ -4,7 +4,7 @@
 Stepper horizontal = Stepper(64, 3, 5, 4, 6);
 Stepper vertical = Stepper(64, 10, 12, 11, 13);
 
-int sH = 0, sV = 0, x, y;
+int sH = 0, sV = 0, x = 250, y = 380;
 double thetaX, thetaY;
 String in;
 
@@ -34,16 +34,19 @@ void loop()
   if (Serial.available() > 0)
   {
     in = Serial.readString();
+
+      x = parseDataX(in);
+      y = parseDataY(in);
   }
 
-  x = parseDataX(in);
-  y = parseDataY(in);
+  thetaX = atan(((x - 250) * 0.15385) / 56);
+  thetaY = atan(((y - 380) * 0.15385) / 56);
 
-  thetaX = atan(((x - 60) * 0.15385) / 56);
-  thetaY = atan(((y - 410) * 0.15385) / 56);
+  vertical.step((thetaY * 250) - sV);
+  sV += (thetaY * 250) - sV;
 
-  horizontal.step(( -1 * (thetaX * 350)) - sH);
-  sH += ( -1 * (thetaX * 350)) - sH;
+  horizontal.step( -1 * ((thetaX * 350) - sH));
+  sH += (thetaX * 350) - sH;
   
   delay(1);
 }
